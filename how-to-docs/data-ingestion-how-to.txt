@@ -15,7 +15,7 @@ Prerequisites to run this file:
     STORAGE_PROVIDER = 'S3'
     ENABLED = TRUE
     STORAGE_AWS_ROLE_ARN = 'arn:aws:iam::796973508947:role/snowflake-s3-role'
-    STORAGE_ALLOWED_LOCATIONS = ('s3://street-fairy/raw/');
+    STORAGE_ALLOWED_LOCATIONS = ('s3://street-fairy/');
 3. Create an external storage in Snowflake pointing to the S3 bucket
     CREATE STAGE my_s3_stage
         URL = 's3://street-fairy/'
