@@ -1,0 +1,29 @@
+version: 2
+
+models:
+  - name: Business_Model
+    description: "Business Table"
+    columns:
+      - name: business_id
+        description: "The primary key for this table"
+        tests:
+          - unique
+          - not_null
+
+  - name: Category_Model
+    description: "Category Table"
+    columns:
+      - name: business_id
+        description: "The foreign key linking to Business_Model"
+        tests:
+          - not_null  
+
+  - name: Attribute_Model  
+    description: "Attribute Table"
+    columns:
+      - name: business_id
+        description: "The foreign key linking to Business_Model"
+        tests:
+          - not_null
+
+  
