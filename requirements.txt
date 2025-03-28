@@ -1,0 +1,17 @@
+# Snowflake for pulling structured business data
+snowflake-snowpark-python
+
+# Vector store
+chromadb>=0.4.0  # use the latest Chroma with PersistentClient
+
+# Embedding model for ChromaDB
+sentence-transformers
+
+# Optional: for OpenAI/GPT LLM integration later
+openai
+
+# If you want to use environment variables for secrets later
+python-dotenv
+
+# for progress bar
+tqdm

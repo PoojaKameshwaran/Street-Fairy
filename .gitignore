@@ -1,0 +1,18 @@
+# Prevent pushing secrets
+key.json
+
+# Python artifacts
+__pycache__/
+*.pyc
+
+# IDE/workspace config
+.vscode/
+.env
+.DS_Store
+
+# remove files in .chromadb
+.chroma/
+
+# ignore .venv
+.venv
+venv
