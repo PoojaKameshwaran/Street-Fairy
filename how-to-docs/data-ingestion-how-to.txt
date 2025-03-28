@@ -1,0 +1,47 @@
+Order of execution of Python files for data ingestion using S3 into Snowflake:
+local_to_s3.py > s3_to_sf_load_raw
+
+local_to_s3.py:
+This file loads to the S3 bucket (which will serve as our external stage when loading to Snowflake) from local. 
+Multipart load with a part size of 10MB is the reason this push is possible from local to S3 with Python.
+
+Prerequisites to run this file:
+1. Create a role in AWS
+    > Set up role as another AWS account
+    > Choose the same account and create the role
+2. Create a snowflake integration
+    CREATE OR REPLACE STORAGE INTEGRATION my_s3_integration
+    TYPE = EXTERNAL_STAGE
+    STORAGE_PROVIDER = 'S3'
+    ENABLED = TRUE
+    STORAGE_AWS_ROLE_ARN = ''
+    STORAGE_ALLOWED_LOCATIONS = ('s3://street-fairy/');
+3. Create an external storage in Snowflake pointing to the S3 bucket
+    CREATE STAGE my_s3_stage
+        URL = 's3://street-fairy/'
+        STORAGE_INTEGRATION = my_s3_integration;
+4. Modify Trust relationship policy
+    In AWS IAM > Trust Relationship paste this instead of default:
+        {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {
+                    "AWS": ""
+                },
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }
+5. Create Permissions in IAM 
+    > Permission policies > Create Permissions > + AmazonS3FullAccess
+
+Execute using python local_to_s3.py
+
+s3_to_sf_load_raw.py:
+This file loads all 3 .json files to snowflake as raw files where each record contains just one VARIANT column.
+The VARIANT field will be processed using dbt pipelines.
+
+No Prerequisites
+Execute using python s3_to_sf_load_raw.py

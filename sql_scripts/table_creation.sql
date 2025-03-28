@@ -1,0 +1,56 @@
+-- DATA FILTERING 
+CREATE OR REPLACE TABLE FILTERED_BUSINESSES as (
+SELECT 
+*
+FROM BUSINESS
+WHERE STATE IN ('PH', 'FL', 'TN', 'IN', 'MO') AND IS_OPEN = '1' AND stars >= 3.0
+);
+
+CREATE OR REPLACE TABLE RELEVANT_REVIEWS as (
+SELECT
+r.*
+FROM REVIEWS as r
+WHERE r.business_id in (
+        SELECT
+        distinct business_id
+        FROM filtered_businesses
+    )
+AND CAST(r.DATE AS DATE) > CAST('2018-01-01' AS DATE)
+);
+
+CREATE OR REPLACE TABLE relevant_users as (
+SELECT
+u.*
+FROM USERS_TABLE as u
+where u.user_id in (
+        SELECT
+        distinct user_id
+        from RELEVANT_REVIEWS
+    )
+);
+
+CREATE OR REPLACE TABLE FILTERED_CATEGORIES AS (
+SELECT
+DISTINCT BUSINESS_ID, CATEGORIES
+FROM FILTERED_BUSINESSES WHERE CATEGORIES IS NOT NULL);
+
+CREATE OR REPLACE TABLE FILTERED_ATTRIBUTES AS (
+SELECT
+*
+FROM ATTRIBUTE_MODEL
+WHERE business_id in (
+    select
+    distinct
+    business_id
+    from filtered_businesses
+));
+
+SELECT
+*
+FROM FILTERED_CATEGORIES LIMIT 10;
+
+SELECT
+*
+FROM FILTERED_BUSINESSES LIMIT 5;
+
+show tables;
