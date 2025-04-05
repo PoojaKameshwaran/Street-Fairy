@@ -14,7 +14,7 @@ from langchain.schema import Document
 # Snowflake connection setup
 conn = snowflake.connector.connect(
     user='BOA',
-    password='Kavinkumar3006$',
+    password='',
     account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
