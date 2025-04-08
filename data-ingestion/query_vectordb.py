@@ -1,26 +1,36 @@
 import chromadb
-from chromadb.utils.embedding_functions import SentenceTransformerEmbeddingFunction
+from sentence_transformers import SentenceTransformer
 
-# Connect to the local persistent vector DB
+# Custom embedding function (same as used during ingestion)
+class MyEmbeddingFunction:
+    def __init__(self):
+        self.model = SentenceTransformer("all-MiniLM-L6-v2")
+
+    def __call__(self, texts):
+        return self.model.encode(texts).tolist()
+
+# Connect to local persistent ChromaDB
 chroma_client = chromadb.PersistentClient(path=".chroma")
 
-# Use the same embedding function as during ingestion
-embedding_fn = SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
-
-# Get the collection
+# Use no internal embedding since we precompute
 collection = chroma_client.get_or_create_collection(
     name="street_fairy_business_kb",
-    embedding_function=embedding_fn
+    embedding_function=None  # Disables internal embedding; we'll embed manually
 )
 
-while(True):
+# Instantiate our embedding function
+embedding_fn = MyEmbeddingFunction()
 
-    # 🔍 Your natural language query
+while True:
+    # 🔍 Get user query
     query = input("Ask Street Fairy: ")
 
-    # Run semantic search
+    # Embed the query using the same model
+    embedded_query = embedding_fn([query])
+
+    # Run semantic search using the precomputed query embedding
     results = collection.query(
-        query_texts=[query],
+        query_embeddings=embedded_query,
         n_results=5,
         include=["documents", "metadatas", "distances"]
     )
@@ -34,5 +44,5 @@ while(True):
         print("📏 Similarity Score:", round(score, 4))
 
     ready = input("Do you want to ask the fairy anything else? Yes or No\n")
-    if(ready == "no" or ready == 'No'):
+    if ready.lower() == "no":
         break

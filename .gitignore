@@ -1,5 +1,6 @@
 # Prevent pushing secrets
 key.json
+gmaps_api_key.txt
 
 # Python artifacts
 __pycache__/
