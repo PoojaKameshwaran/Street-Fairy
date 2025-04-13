@@ -5,7 +5,7 @@ import numpy as np
 conn= snowflake.connector.connect(
     user='BOA',
     password='',
-    account='PDB57018',
+    account='',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
     schema='PUBLIC'

@@ -12,8 +12,8 @@ import binascii
 # Snowflake connection setup
 conn = snowflake.connector.connect(
     user='BOA',
-    password='Kavinkumar3006$',
-    account='PDB57018',
+    password='',
+    account='',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
     schema='PUBLIC'
