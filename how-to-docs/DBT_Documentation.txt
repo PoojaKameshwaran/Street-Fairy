@@ -1,0 +1,25 @@
+step 1:Install DBT in VS code extension search
+step 2: Create Virtual Environment python -m venv dbt-venv
+step 3: activate the virtsual env --> .\dbt_venv\scripts\Activate.ps1
+step 4: pip install dbt-snowflake (snowflake/resshift/postgrete)
+step 5: Give all snowflake details (account,DWH,DB) 
+STEP 6: Project folder->under models->construct SQL query
+step 7: changing the models form view -->Table
+under yaml file under models tag
+models:
+  Test_project:
+   Model_1:
+    schema:
+	materialized:table
+	
+else under macro
+--> we can overwrite in such a way that views are replaced by tables
+	
+
+To run DBT:
+
+dbt init Test_Project
+dbt debug
+dbt run
+dbt run --models attribute_processing_model
+
