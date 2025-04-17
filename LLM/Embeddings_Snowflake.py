@@ -11,9 +11,9 @@ import binascii
 
 # Snowflake connection setup
 conn = snowflake.connector.connect(
-    user='BOA',
+    user='',
     password='',
-    account='',
+    account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
     schema='PUBLIC'
@@ -33,24 +33,66 @@ cursor = conn.cursor()
 
 # Query to get the business data from Snowflake
 query = r"""
-SELECT business_id,name,latitude,longitude,categories,attributes,state
+SELECT business_id,name,latitude,longitude,categories,attributes,state ,POSTAL_CODE,stars, hours
 FROM ENGINEERED_BUSINESSES
 """
 
 # Fetching data into a DataFrame
 df = pd.read_sql(query, conn)
 
-def flatten_attributes(attr_json):
-    if isinstance(attr_json, dict):
-        return ", ".join([f"{key},{value}" for key, value in attr_json.items()])
-    return ""
+#def flatten_attributes(attr_json):
+#    if isinstance(attr_json, dict):
+#        return ", ".join([f"{key},{value}" for key, value in attr_json.items()])
+#    return ""
 
 # Apply flattening of attributes
-df["FLATTENED_ATTRIBUTES"] = df["ATTRIBUTES"].apply(lambda x: flatten_attributes(json.loads(x)))
-df['combined_info'] = df['CATEGORIES'] + " " + df['FLATTENED_ATTRIBUTES']
+#df["FLATTENED_ATTRIBUTES"] = df["ATTRIBUTES"].apply(lambda x: flatten_attributes(json.loads(x)))
+#df['combined_info'] = df['CATEGORIES'] + " " + df['FLATTENED_ATTRIBUTES']
 
-# Drop duplicates from the DataFrame
+def attributes_to_text(attr_json):
+    if not isinstance(attr_json, dict):
+        return ""
+    
+    descriptions = []
+    for key, value in attr_json.items():
+        if value.lower() in ['true', 'yes']:
+            if "Ambience_" in key:
+                descriptions.append(f"Ambience is {key.split('_')[-1]}")
+            elif "BusinessParking" in key:
+                descriptions.append(f"Has {key.split('_')[-1]} parking")
+            else:
+                descriptions.append(f"{key.replace('_', ' ')} available")
+        elif value.lower() not in ['false', 'no', 'null']:
+            descriptions.append(f"{key.replace('_', ' ')} is {value}")
+    
+    return ". ".join(descriptions)
+
+def hours_to_text(hours_json):
+    if not isinstance(hours_json, dict):
+        return ""
+    
+    return ". ".join([
+        f"Open on {day} from {time.replace(':0', ':00')}"
+        for day, time in hours_json.items() if time != "0:0-0:0"
+    ])
+
+
+
+df["FLATTENED_ATTRIBUTES"] = df["ATTRIBUTES"].apply(lambda x: attributes_to_text(json.loads(x)) if pd.notnull(x) else "")
+df["HOURS"] = df["HOURS"].apply(lambda x: hours_to_text(json.loads(x)) if pd.notnull(x) else "")
+df = df[~df["FLATTENED_ATTRIBUTES"].str.contains("RestaurantsPriceRange", na=False)]
+
+df["combined_info"] = (
+    "Categories: " + df["CATEGORIES"].fillna("") + ". " +
+    df["FLATTENED_ATTRIBUTES"].fillna("") + ". " +
+    df["HOURS"].fillna("") + ". " +
+    "Rated " + df["STARS"].astype(str) + " stars."
+)
+
+
+
 df = df.drop_duplicates()
+df = df.reset_index(drop=True)
 
 # Load the SentenceTransformer model
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2') 
@@ -65,7 +107,7 @@ category_embeddings = np.array(category_embeddings, dtype=np.float32)
 combined_index = faiss.IndexFlatL2(category_embeddings.shape[1]) 
 combined_index.add(category_embeddings)
 
-faiss.write_index(combined_index, "faiss_combined_businesses.index")
+#faiss.write_index(combined_index, "faiss_combined_businesses.index")
 
 
 
@@ -85,7 +127,7 @@ for idx, row in df.iterrows():
     longitude = row['LONGITUDE']
     state = (row['STATE'])
     categories = escape_string(row['CATEGORIES'])
-    flattened_attributes = escape_string(row['FLATTENED_ATTRIBUTES'])
+    flattened_attributes = escape_string(row['combined_info'])
     embedding_str = json.dumps(category_embeddings[idx].tolist())  # Ensure that embedding is properly serialized
     
     # Construct SQL statement and print for debugging
@@ -112,7 +154,7 @@ for idx, row in df.iterrows():
     longitude = row['LONGITUDE']
     state = row['STATE']
     categories = escape_string(row['CATEGORIES'])
-    flattened_attributes = escape_string(row['FLATTENED_ATTRIBUTES'])
+    flattened_attributes = escape_string(row['combined_info'])
     embedding_str = json.dumps(category_embeddings[idx].tolist())
 
     data_to_insert.append((
