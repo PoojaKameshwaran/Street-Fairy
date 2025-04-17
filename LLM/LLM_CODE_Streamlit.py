@@ -5,6 +5,7 @@ from sentence_transformers import SentenceTransformer
 from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from sklearn.metrics.pairwise import cosine_similarity
+from scipy.spatial.distance import euclidean
 import faiss
 import snowflake.connector
 
@@ -14,25 +15,27 @@ def load_data_from_snowflake():
     conn = snowflake.connector.connect(
     user='',
     password='',
-    account='',
+    account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
     schema='PUBLIC'
     )
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM BUSINESS_EMBEDDINGS")
-    data = cursor.fetchall()
 
-    columns = ['BUSINESS_ID', 'NAME', 'LATITUDE', 'LONGITUDE', 'STATE', 'CATEGORIES', 'FLATTENED_ATTRIBUTES', 'EMBEDDING']
-    df = pd.DataFrame(data, columns=columns)
+    query = """
+    SELECT BUSINESS_ID, NAME, LATITUDE, LONGITUDE, STATE,
+        CATEGORIES, FLATTENED_ATTRIBUTES,
+        PARSE_JSON(embedding)::VECTOR(FLOAT, 384) AS EMBEDDING
+    FROM BUSINESS_EMBEDDINGS
+    """
 
-    df['EMBEDDING'] = df['EMBEDDING'].apply(lambda x: x.strip('[]').replace(' ', '').split(',') if isinstance(x, str) else x)
-    df['EMBEDDING'] = df['EMBEDDING'].apply(lambda x: np.array(x, dtype=float) if isinstance(x, list) else x)
+    cursor.execute(query)  # ✅ Run the query
+    df = cursor.fetch_pandas_all()  # ✅ Get results as DataFrame
 
     conn.close()
     return df
 
-# --- Get user location ---
+        # --- Get user location ---
 def get_lat_lon(location_query):
     geolocator = Nominatim(user_agent="geopyApp")
     try:
@@ -43,7 +46,6 @@ def get_lat_lon(location_query):
         return None, None
     return None, None
 
-# --- Similarity Search Logic ---
 def run_similarity_search(user_text, user_location, df):
     latitude, longitude = get_lat_lon(user_location)
     if latitude is None:
@@ -54,51 +56,87 @@ def run_similarity_search(user_text, user_location, df):
     
     if df_filtered.empty:
         return pd.DataFrame()
+    
 
+    # --- Similarity Search Logic ---
+def run_similarity_search(user_location, query_input, df):
+    # Get location coordinates (latitude and longitude) from user input
+    latitude, longitude = get_lat_lon(user_location)
+    if latitude is None:
+        return pd.DataFrame()  # If location lookup fails, return empty DataFrame
+    
+    # Filter businesses based on distance from the user (5 km radius)
+    df['DISTANCE'] = df.apply(lambda row: geodesic((latitude, longitude), (row['LATITUDE'], row['LONGITUDE'])).km, axis=1)
+    df_filtered = df[df['DISTANCE'] <= 5].copy()  # Filter businesses within 5 km of user
+    
+    if df_filtered.empty:
+        return pd.DataFrame()  # Return empty if no businesses are within the 5 km range
+
+    # Get the user query directly from Streamlit input
+    if not query_input:
+        return pd.DataFrame()  # Return empty DataFrame if no query is provided
+
+    # Use SentenceTransformer to encode user query (query_input) into a query embedding
     embedding_model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
-    query_embedding = embedding_model.encode([user_text])
-    query_embedding = np.array(query_embedding).reshape(1, -1)
-
-    embedding_size = len(df_filtered['EMBEDDING'].iloc[0])
-    index = faiss.IndexFlatL2(embedding_size)
+    query_embedding = embedding_model.encode([query_input])  # Encode the user text into an embedding
+    #query_embedding = np.array(query_embedding).reshape(1, -1) 
+    query_embedding = np.array(query_embedding, dtype=np.float32).reshape(1, -1)  # Ensure the shape is correct (1, embedding_dim)
+   
+    # Prepare FAISS index and business embeddings for similarity comparison
+    embedding_size = len(df_filtered['EMBEDDING'].iloc[0])  # Length of each business embedding
+    index = faiss.IndexFlatL2(embedding_size)  # Initialize FAISS index for L2 (Euclidean) similarity
+    df_filtered['EMBEDDING'] = df_filtered['EMBEDDING'].apply(lambda x: np.array(x, dtype=float))
+    # Stack the business embeddings into a single matrix
     all_embeddings = np.vstack(df_filtered['EMBEDDING'].values)
-    index.add(all_embeddings)
+    index.add(all_embeddings)  # Add all business embeddings to the FAISS index
 
-    k = min(20, len(df_filtered))
-    distances, indices = index.search(query_embedding, k)
+    # Perform the similarity search with the user query embedding
+    k = min(20, len(df_filtered))  # Get top 20 nearest neighbors or fewer if less data
+    distances, indices = index.search(query_embedding, k)  # Search for k closest matches
 
     results = []
-    for idx in indices[0]:
+    for idx in indices[0]:  # Loop through the indices of the top k results
         if idx < len(df_filtered):
-            row = df_filtered.iloc[idx]
-            cosine_sim = cosine_similarity(query_embedding, row['EMBEDDING'].reshape(1, -1))[0][0]
-            if cosine_sim >= 0:
-                results.append({
-                    'BUSINESS_ID': row['BUSINESS_ID'],
-                    'NAME': row['NAME'],
-                    'CATEGORIES': row['CATEGORIES'],
-                    'FLATTENED_ATTRIBUTES': row['FLATTENED_ATTRIBUTES'],
-                    'STATE': row['STATE'],
-                    'LATITUDE': row['LATITUDE'],
-                    'LONGITUDE': row['LONGITUDE'],
-                    'SIMILARITY_SCORE': cosine_sim,
-                    'DISTANCE': row['DISTANCE']
-                })
-    return pd.DataFrame(results).sort_values(by='DISTANCE').sort_values(by='SIMILARITY_SCORE').head(5)
+            row = df_filtered.iloc[idx]  # Get the corresponding row from the filtered DataFrame
+            cosine_sim = cosine_similarity(query_embedding, row['EMBEDDING'].reshape(1, -1))[0][0]  # Calculate cosine similarity
+            #dist = euclidean(query_embedding.flatten(), row['EMBEDDING'].flatten())
+            #if cosine_sim >= round(avg_sim, 4):  # Only consider matches with a positive similarity score
+            results.append({
+                'BUSINESS_ID': row['BUSINESS_ID'],
+                'NAME': row['NAME'],
+                'CATEGORIES': row['CATEGORIES'],
+                'FLATTENED_ATTRIBUTES': row['FLATTENED_ATTRIBUTES'],
+                'STATE': row['STATE'],
+                'LATITUDE': row['LATITUDE'],
+                'LONGITUDE': row['LONGITUDE'],
+                'SIMILARITY_SCORE': cosine_sim,
+                'DISTANCE': row['DISTANCE']
+            })
+
+    # Return the results sorted by distance and similarity score
+    return pd.DataFrame(results).sort_values(by=['SIMILARITY_SCORE'], ascending=[False]).head(3)
+    #return pd.DataFrame(results)
+
 
 # --- Streamlit UI ---
-st.title("🔍 Restaurant Finder using LLM & FAISS")
+st.title("🔍 STREET FAIRY RECOMMENDER")
 
 location_input = st.text_input("Enter your location (e.g., Tampa):")
-query_input = st.text_input("What kind of restaurant are you looking for?")
+query_input = st.text_input("Please post your requirements?")
+
 
 if st.button("Find Recommendations"):
     with st.spinner("Loading recommendations..."):
         df = load_data_from_snowflake()
-        results = run_similarity_search(query_input, location_input, df)
-        if not results.empty:
-            st.success(f"Found {len(results)} results!")
-            st.dataframe(results)
-            st.download_button("Download CSV", data=results.to_csv(index=False), file_name="LLM_Model.csv")
+        if df is None or df.empty:
+            st.error("Failed to load data from Snowflake.")
+        elif not location_input or not query_input:
+            st.warning("Please enter both location and restaurant type.")
         else:
-            st.warning("No businesses found within 5 km of your location.")
+            results = run_similarity_search(location_input, query_input, df)
+            if not results.empty:
+                st.success(f"Found {len(results)} results!")
+                st.dataframe(results)
+                st.download_button("Download CSV", data=results.to_csv(index=False), file_name="LLM_Model.csv")
+            else:
+                st.warning("No businesses found within 5 km of your location.")
