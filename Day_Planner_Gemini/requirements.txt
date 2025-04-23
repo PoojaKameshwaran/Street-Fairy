@@ -1,0 +1,11 @@
+streamlit
+snowflake-connector-python
+sentence-transformers
+faiss-cpu
+geopy
+spacy
+us
+google-generativeai
+openai
+pandas
+numpy
