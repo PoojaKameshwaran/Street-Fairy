@@ -1,0 +1,68 @@
+-- DATA FILTERING 
+CREATE OR REPLACE TABLE FILTERED_BUSINESSES as (
+SELECT 
+*
+EXCLUDE(IS_OPEN)
+FROM BUSINESS
+WHERE STATE IN ('PA', 'FL', 'TN', 'IN', 'MO') AND IS_OPEN = '1' AND stars >= 3.0
+);
+
+CREATE OR REPLACE TABLE RELEVANT_REVIEWS as (
+SELECT
+r.*
+FROM REVIEWS as r
+WHERE r.business_id in (
+        SELECT
+        distinct business_id
+        FROM filtered_businesses
+    )
+AND CAST(r.DATE AS DATE) > CAST('2018-01-01' AS DATE)
+);
+
+CREATE OR REPLACE TABLE relevant_users as (
+SELECT
+u.*
+FROM USERS_TABLE as u
+where u.user_id in (
+        SELECT
+        distinct user_id
+        from RELEVANT_REVIEWS
+    )
+);
+
+CREATE OR REPLACE TABLE FILTERED_CATEGORIES AS (
+SELECT
+DISTINCT BUSINESS_ID, CATEGORIES
+FROM FILTERED_BUSINESSES WHERE CATEGORIES IS NOT NULL);
+
+CREATE OR REPLACE TABLE FILTERED_ATTRIBUTES AS (
+SELECT
+BUSINESS_ID, 
+ATTRIBUTES AS ATTRIBUTES
+FROM EXTRACTED_ATTRIBUTES
+WHERE business_id in (
+    select
+    distinct
+    business_id
+    from filtered_businesses
+));
+
+SELECT
+COUNT(*)
+FROM FILTERED_BUSINESSES;
+
+CREATE OR REPLACE TABLE EXTRACTED_ATTRIBUTES AS 
+(SELECT * FROM FILTERED_ATTRIBUTES);
+
+create or replace table engineered_businesses as (
+SELECT
+fb.*,
+fa.attributes
+FROM (SELECT * EXCLUDE (attributes) FROM FILTERED_BUSINESSES) as fb
+JOIN EXTRACTED_ATTRIBUTES AS fa on fb.business_id = fa.business_id
+);
+
+SELECT
+COUNT(*)
+FROM engineered_businesses;
+show tables;

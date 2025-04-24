@@ -1,0 +1,25 @@
+# Core ML and embedding stack
+numpy==1.26.4
+onnxruntime==1.21.0
+sentence-transformers
+
+# ChromaDB for vector DB
+chromadb==0.4.24
+
+# Snowflake
+snowflake-snowpark-python==1.27.0
+
+# Utility packages
+tqdm==4.66.2
+protobuf<5.0.0  # Ensures compatibility with onnxruntime
+packaging>=23.0
+
+# Optional: prevent unexpected upgrades
+flatbuffers==23.5.26
+sympy>=1.12
+
+huggingface_hub
+langchain_community
+googlemaps
+pgeocode
+streamlit
