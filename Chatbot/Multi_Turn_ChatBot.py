@@ -15,8 +15,8 @@ from utils import load_data_from_snowflake, get_lat_lon, run_similarity_search
 @st.cache_resource
 def get_snowflake_connection():
     conn = snowflake.connector.connect(
-    user='BOA',
-    password='Kavinkumar3006$',
+    user='',
+    password='',
     account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
