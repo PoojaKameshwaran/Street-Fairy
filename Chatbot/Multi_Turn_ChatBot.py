@@ -15,8 +15,8 @@ from utils import load_data_from_snowflake, get_lat_lon, run_similarity_search
 @st.cache_resource
 def get_snowflake_connection():
     conn = snowflake.connector.connect(
-    user='BOA',
-    password='Kavinkumar3006$',
+    user='', #give your username and password
+    password='',
     account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
@@ -149,7 +149,7 @@ def screen_2():
     else:
         st.info("🔄 Follow-up chat will be available after you enter location and requirements.")
 
-# --- Main Function ---
+    # --- Main Function ---
 def main():
     if "screen" not in st.session_state:
         st.session_state.screen = 0  # Start at welcome/login/registration screen

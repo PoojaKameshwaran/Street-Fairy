@@ -13,8 +13,8 @@ import snowflake.connector
 
 def load_data_from_snowflake():
     conn = snowflake.connector.connect(
-    user='BOA',
-    password='Kavinkumar3006$',
+    user='',
+    password='',
     account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',

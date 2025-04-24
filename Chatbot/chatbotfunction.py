@@ -42,6 +42,7 @@ def process_chat_input(user_input, location_input):
     else:
         "No Results Found"
 
+
 def fetch_and_display_recommendations(location_input, query_input):
     with st.spinner("Loading recommendations..."):
         df = load_data_from_snowflake()
@@ -69,4 +70,3 @@ def fetch_and_display_recommendations(location_input, query_input):
             else:
                 st.warning("No results found for your query.")
                 return None
-
