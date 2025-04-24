@@ -13,8 +13,8 @@ import snowflake.connector
 
 def load_data_from_snowflake():
     conn = snowflake.connector.connect(
-    user='',
-    password='',
+    user='BOA',
+    password='Kavinkumar3006$',
     account='PDB57018',
     warehouse='ANIMAL_TASK_WH',
     database='STREET_FAIRY',
@@ -104,6 +104,6 @@ def run_similarity_search(user_location, query_input, df):
             })
 
     # Return the results sorted by distance and similarity score
-    return pd.DataFrame(results).sort_values(by=['SIMILARITY_SCORE'], ascending=[False]).head(3)
+    return pd.DataFrame(results).sort_values(by=['SIMILARITY_SCORE'], ascending=[False]).head(2)
     #return pd.DataFrame(results)
 
