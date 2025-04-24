@@ -16,3 +16,11 @@ python-dotenv
 # for progress bar
 tqdm
 
+# for location
+geopy
+
+# for reading key.json file
+os
+json
+
+

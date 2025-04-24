@@ -8,29 +8,38 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import euclidean
 import faiss
 import snowflake.connector
-
-
+import os
+import json
 
 def load_data_from_snowflake():
+    # Compute path to key.json (one level above current script)
+    current_dir = os.path.dirname(os.path.abspath(__file__))  # Chatbot/
+    key_path = os.path.join(current_dir, "..", "key.json")    # ../key.json
+
+    # Load credentials from key.json
+    with open(key_path, 'r') as f:
+        creds = json.load(f)
+
+    # Connect to Snowflake using credentials
     conn = snowflake.connector.connect(
-    user='',
-    password='',
-    account='PDB57018',
-    warehouse='ANIMAL_TASK_WH',
-    database='STREET_FAIRY',
-    schema='PUBLIC'
+        user=creds['user'],
+        password=creds['password'],
+        account=creds['account'],
+        warehouse=creds['warehouse'],
+        database=creds['database'],
+        schema=creds['schema']
     )
     cursor = conn.cursor()
 
+    # Run query
     query = """
     SELECT BUSINESS_ID, NAME, LATITUDE, LONGITUDE, STATE,
         CATEGORIES, FLATTENED_ATTRIBUTES,
         PARSE_JSON(embedding)::VECTOR(FLOAT, 384) AS EMBEDDING
     FROM BUSINESS_EMBEDDINGS
     """
-
-    cursor.execute(query)  # ✅ Run the query
-    df = cursor.fetch_pandas_all()  # ✅ Get results as DataFrame
+    cursor.execute(query)
+    df = cursor.fetch_pandas_all()
 
     conn.close()
     return df
@@ -104,6 +113,32 @@ def run_similarity_search(user_location, query_input, df):
             })
 
     # Return the results sorted by distance and similarity score
-    return pd.DataFrame(results).sort_values(by=['SIMILARITY_SCORE'], ascending=[False]).head(3)
-    #return pd.DataFrame(results)
+    result_df = pd.DataFrame(results).sort_values(by=['SIMILARITY_SCORE'], ascending=False)
+
+    # If we found good matches, return them
+    if not result_df.empty and result_df['SIMILARITY_SCORE'].max() >= 0.1:
+        return result_df.head(5)
+
+    # 🔁 Fallback: show top businesses nearby by rating + reviews
+    fallback_df = df_filtered.copy()
+    fallback_df['FALLBACK_SCORE'] = fallback_df['STARS'] * fallback_df['REVIEW_COUNT']
+    fallback_df = fallback_df.sort_values(by='FALLBACK_SCORE', ascending=False)
+
+    # Use same return format
+    fallback_results = []
+    for _, row in fallback_df.head(5).iterrows():
+        fallback_results.append({
+            'BUSINESS_ID': row['BUSINESS_ID'],
+            'NAME': row['NAME'],
+            'CATEGORIES': row['CATEGORIES'],
+            'FLATTENED_ATTRIBUTES': row['FLATTENED_ATTRIBUTES'],
+            'STATE': row['STATE'],
+            'LATITUDE': row['LATITUDE'],
+            'LONGITUDE': row['LONGITUDE'],
+            'SIMILARITY_SCORE': 0.0,
+            'DISTANCE': row['DISTANCE'],
+            'FALLBACK': True
+        })
+
+    return pd.DataFrame(fallback_results)
 
