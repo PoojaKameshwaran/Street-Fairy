@@ -1,4 +1,4 @@
-# Street-Fairy
+# Street-Fairy: Business Recommendations ChatBot with Personalized Itinerary Planning
 
 Street Fairy is a business recommendation system that leverages the Yelp dataset to provide personalized suggestions to users. The project integrates Snowflake and Streamlit to deliver real-time recommendations through a user-friendly interface.
 
