@@ -61,22 +61,6 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
-## 📁 src/
-
-This directory contains the core modules responsible for data processing, embedding generation, and recommendation logic.
-
-- **data_loader.py**  
-  Handles the ingestion of data from AWS S3 into Snowflake using Snowpipe. It defines functions to automate the loading process for the `business`, `reviews`, and `users` tables.
-
-- **embedding_generator.py**  
-  Processes the business table to generate embeddings that capture the features of each business. These embeddings are used to understand similarities between businesses.
-
-- **user_profile_builder.py**  
-  Constructs user profiles by analyzing their reviews and interactions. It aggregates user preferences to aid in personalized recommendations.
-
-- **recommendation_engine.py**  
-  Utilizes the business embeddings and user profiles to generate personalized business recommendations. It likely employs similarity metrics or machine learning models to rank businesses.
-
 ---
 
 ## 📁 DBT Models/
@@ -139,6 +123,85 @@ This directory contains all DBT models and configuration files used for transfor
 - Adds tests for primary/foreign keys (e.g., uniqueness and not-null constraints) to ensure data quality.
 
 ---
+
+
+## 📁 LLM/
+
+This directory contains scripts for embedding generation, vector search, and LLM-powered business recommendation logic, integrated with Snowflake and FAISS.
+
+---
+
+### 1. **Embeddings_Snowflake.py**
+*Generates sentence embeddings for businesses and loads them into Snowflake.*
+
+- Connects to Snowflake and fetches business data.
+- Processes and flattens business attributes and hours into descriptive text.
+- Uses `SentenceTransformer` to generate embeddings for each business.
+- Builds a FAISS index for fast vector search.
+- Batch-inserts the business embeddings into the `BUSINESS_EMBEDDINGS` table in Snowflake.
+
+---
+
+### 2. **LLM_CODE.py**
+*Performs similarity search and business recommendations via command line.*
+
+- Connects to Snowflake and loads business embeddings.
+- Retrieves user location via city input and filters businesses within a 5 km radius.
+- Uses FAISS and `SentenceTransformer` to compute semantic similarity with user queries.
+- Outputs and saves the top recommended businesses as a CSV file.
+
+---
+
+### 3. **LLM_CODE_Streamlit.py**
+*Streamlit-based UI for LLM-powered business recommendations.*
+
+- Loads business embeddings from Snowflake.
+- Accepts user location and query through a Streamlit form.
+- Filters businesses within a 5 km radius.
+- Runs semantic similarity search with FAISS and `SentenceTransformer`.
+- Displays top results in an interactive data table and allows CSV download.
+
+---
+
+**Dependencies:**  
+- `streamlit`  
+- `snowflake-connector-python`  
+- `sentence-transformers`  
+- `faiss-cpu`  
+- `geopy`  
+- `pandas`, `numpy`, `scikit-learn`
+
+---
+
+**Usage:**  
+- Use `Embeddings_Snowflake.py` to (re)generate and store embeddings.
+- Run `LLM_CODE.py` for terminal-based recommendations.
+- Run `LLM_CODE_Streamlit.py` for an interactive Streamlit app:
+  ```bash
+  streamlit run LLM_CODE_Streamlit.py
+
+
+
+
+
+
+
+
+## 📁 src/
+
+This directory contains the core modules responsible for data processing, embedding generation, and recommendation logic.
+
+- **data_loader.py**  
+  Handles the ingestion of data from AWS S3 into Snowflake using Snowpipe. It defines functions to automate the loading process for the `business`, `reviews`, and `users` tables.
+
+- **embedding_generator.py**  
+  Processes the business table to generate embeddings that capture the features of each business. These embeddings are used to understand similarities between businesses.
+
+- **user_profile_builder.py**  
+  Constructs user profiles by analyzing their reviews and interactions. It aggregates user preferences to aid in personalized recommendations.
+
+- **recommendation_engine.py**  
+  Utilizes the business embeddings and user profiles to generate personalized business recommendations. It likely employs similarity metrics or machine learning models to rank businesses.
 
 
 ## 📁 app/
