@@ -25,7 +25,7 @@ def screen_2():
                 )
 
                 next_prompt = f"""
-                You are Street Fairy \U0001f9da\ufe0f. The last place wasn't quite right.
+                You are Street Fairy 🧚‍♀️. The last place wasn't quite right.
                 Here's another nearby business:
 
                 - {next_suggestion['NAME']} ({next_suggestion['CATEGORIES']}, {next_suggestion.get('CITY', '')}, {next_suggestion['STATE']})
@@ -51,7 +51,7 @@ def screen_2():
         business_str = f"- {top_result['NAME']} ({top_result['CATEGORIES']}, {top_result.get('CITY', '')}, {top_result['STATE']})"
 
         rec_prompt = f"""
-        You are Street Fairy \U0001f9da\ufe0f helping users find places nearby.
+        You are Street Fairy 🧚‍♀️ helping users find places nearby.
         The user asked: "{user_message}"
         Here's a business we found:
         {business_str}

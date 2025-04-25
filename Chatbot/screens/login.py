@@ -2,7 +2,7 @@ import streamlit as st
 from utils.database import get_snowflake_connection
 
 def screen_0():
-    st.title("\U0001f512 Welcome to Street Fairy")
+    st.title("🔐 Welcome to Street Fairy")
     option = st.radio("Are you an existing user?", ("Yes", "No"))
 
     if option == "Yes":
@@ -37,7 +37,7 @@ def screen_0():
                 st.error("Invalid credentials!")
 
     elif option == "No":
-        st.markdown("### \U0001f464 New User Registration")
+        st.markdown("### 👤 New User Registration")
         user_name = st.text_input("Enter your Name:")
         user_id = st.text_input("Choose a User ID")
         password = st.text_input("Choose a Password", type="password")
