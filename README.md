@@ -79,6 +79,68 @@ This directory contains the core modules responsible for data processing, embedd
 
 ---
 
+## 📁 DBT Models/
+
+This directory contains all DBT models and configuration files used for transforming and enriching the business dataset for the recommendation engine.
+
+---
+
+### 1. **Attribute_Model.sql**
+*Extracts and flattens business attributes from JSON.*
+
+- Parses the `Attributes` column for open businesses in selected states.
+- Flattens the JSON attributes into key-value pairs for easier downstream processing.
+
+---
+
+### 2. **Attribute_Processing_Model.sql**
+*Processes and normalizes complex, nested attribute values.*
+
+- Cleans up attribute values by handling quotes, `None`, and other string patterns.
+- Further flattens nested JSON objects by concatenating attribute names and sub-keys.
+
+---
+
+### 3. **Business_Model.sql**
+*Cleans and structures the business table.*
+
+- Selects open businesses with at least a 3-star rating from specified states.
+- Extracts business details including name, address, categories, and daily hours.
+
+---
+
+### 4. **Category_Model.sql**
+*Splits and flattens business categories.*
+
+- Splits the `Categories` field into individual values for each business.
+- Produces a table of business-category pairs for flexible category analysis.
+
+---
+
+### 5. **Final_Attribute_Model.sql**
+*Combines and cleans processed attributes.*
+
+- Merges results from `Attribute_Model` and `Attribute_Processing_Model`.
+- Removes invalid or placeholder values, standardizing the final attribute set for each business.
+
+---
+
+### 6. **dbt_project.yml**
+*DBT project configuration file.*
+
+- Defines project structure, model/materialization defaults, and folder paths for models, macros, seeds, etc.
+
+---
+
+### 7. **schema.yml**
+*Schema and data quality tests for DBT models.*
+
+- Documents each model and its columns.
+- Adds tests for primary/foreign keys (e.g., uniqueness and not-null constraints) to ensure data quality.
+
+---
+
+
 ## 📁 app/
 
 Contains the Streamlit application that serves as the user interface for the recommendation system.
