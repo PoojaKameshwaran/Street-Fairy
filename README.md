@@ -179,6 +179,77 @@ This directory contains scripts for embedding generation, vector search, and LLM
 - Run `LLM_CODE_Streamlit.py` for an interactive Streamlit app:
   ```bash
   streamlit run LLM_CODE_Streamlit.py
+---
+
+
+## 📁 data-ingestion/
+
+This folder contains scripts for data loading, transformation, S3/Snowflake operations, and vector database (ChromaDB) ingestion for the Street Fairy project.
+
+---
+
+### 1. **Filtered_Attribute_Creation.py**
+*Filters and aggregates business attributes, then loads them into Snowflake.*
+
+- Connects to Snowflake and queries for clean, non-null attribute values.
+- Aggregates attributes per business and inserts them into the `Filtered_Attributes` table.
+
+---
+
+### 2. **S3_Data_Load.py**
+*Uploads local CSV files to AWS S3 buckets.*
+
+- Uses `boto3` to authenticate and interact with AWS S3.
+- Uploads the main business dataset to an S3 bucket for further use.
+
+---
+
+### 3. **S3_Snowflake_DataLoad_Github.py**
+*Loads CSV data from S3 into Snowflake tables.*
+
+- Connects to Snowflake and runs a `COPY INTO` command to load CSV data from S3 stage into a Snowflake table.
+
+---
+
+### 4. **cleanup_kb.py**
+*Deletes the persistent vector database collection.*
+
+- Connects to ChromaDB and deletes the `street_fairy_business_kb` collection for a clean slate.
+
+---
+
+### 5. **ingest_business_kb.py**
+*Ingests enriched business data from Snowflake into ChromaDB for vector search.*
+
+- Pulls business records using Snowpark.
+- Formats business metadata and descriptions for semantic search.
+- Adds documents and metadata to ChromaDB with embeddings for later retrieval.
+
+---
+
+### 6. **ingest_kb.py**
+*Joins filtered categories and attributes, formats, and ingests them into ChromaDB.*
+
+- Merges categories and attributes from Snowflake.
+- Flattens and cleans metadata for each business.
+- Ingests into a persistent ChromaDB collection using semantic embeddings.
+
+---
+
+### 7. **query_vectordb.py**
+*Runs semantic search queries against the local ChromaDB knowledge base.*
+
+- Connects to the ChromaDB collection with SentenceTransformer embeddings.
+- Accepts user questions, runs vector search, and prints top business matches and their metadata.
+
+---
+
+---
+
+**Usage:**  
+- Use ingestion scripts to process, clean, and load data into Snowflake, S3, and ChromaDB as needed.
+- Use `query_vectordb.py` for testing semantic search over the vector database.
+---
 
 
 
