@@ -8,15 +8,26 @@ from sentence_transformers import SentenceTransformer ##    LLM model
 from langchain.schema import Document
 import base64
 import binascii
+from dotenv import load_dotenv
+import os
+load_dotenv()
+
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
+
 
 # Snowflake connection setup
 conn = snowflake.connector.connect(
-    user='',
-    password='',
-    account='PDB57018',
-    warehouse='ANIMAL_TASK_WH',
-    database='STREET_FAIRY',
-    schema='PUBLIC'
+    user=snowflake_user,
+    password=snowflake_password,
+    account=snowflake_account,
+    warehouse=snowflake_warehouse,
+    database=snowflake_database,
+    schema=snowflake_schema
 )
 
 # Snowflake connection setup (assuming `conn` is already established)
@@ -80,7 +91,9 @@ def hours_to_text(hours_json):
 
 df["FLATTENED_ATTRIBUTES"] = df["ATTRIBUTES"].apply(lambda x: attributes_to_text(json.loads(x)) if pd.notnull(x) else "")
 df["HOURS"] = df["HOURS"].apply(lambda x: hours_to_text(json.loads(x)) if pd.notnull(x) else "")
-df = df[~df["FLATTENED_ATTRIBUTES"].str.contains("RestaurantsPriceRange", na=False)]
+#df = df[~df["FLATTENED_ATTRIBUTES"].str.contains("RestaurantsPriceRange", na=False)]
+df["FLATTENED_ATTRIBUTES"] = df["FLATTENED_ATTRIBUTES"].str.replace("RestaurantsPriceRange", "Price Range", regex=False)
+
 
 df["combined_info"] = (
     "Categories: " + df["CATEGORIES"].fillna("") + ". " +

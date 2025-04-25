@@ -1,0 +1,26 @@
+[0m19:57:22.964017 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA0553CB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025C9E769A90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA127F390>]}
+
+
+============================== 19:57:22.971880 | 1e9a5af2-4350-4d9d-8647-3483400a4e04 ==============================
+[0m19:57:22.971880 [info ] [MainThread]: Running with dbt=1.9.0
+[0m19:57:22.972707 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'warn_error': 'None', 'fail_fast': 'False', 'version_check': 'True', 'log_path': 'c:\\Users\\deepa\\Documents\\GitHub\\Street-Fairy\\Deepana_codes\\logs', 'debug': 'False', 'profiles_dir': 'C:\\Users\\deepa\\.dbt', 'use_colors': 'True', 'use_experimental_parser': 'False', 'no_print': 'None', 'quiet': 'False', 'empty': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'introspect': 'True', 'invocation_command': 'dbt ', 'static_parser': 'True', 'target_path': 'None', 'log_format': 'default', 'send_anonymous_usage_stats': 'True'}
+[0m19:57:23.206018 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '1e9a5af2-4350-4d9d-8647-3483400a4e04', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA0C4D350>]}
+[0m19:57:23.234560 [info ] [MainThread]: Warning: No packages were found in packages.yml
+[0m19:57:23.236670 [info ] [MainThread]: Warning: No packages were found in packages.yml
+[0m19:57:23.238398 [debug] [MainThread]: Command `cli deps` succeeded at 19:57:23.238096 after 0.51 seconds
+[0m19:57:23.238917 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA17FFAC0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA1849480>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025CA15DAF50>]}
+[0m19:57:23.239362 [debug] [MainThread]: Flushing usage events
+[0m19:57:23.545634 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m20:03:11.428852 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7D5C3CB0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7B7ADA90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7E2DF390>]}
+
+
+============================== 20:03:11.437806 | 5daf6cbe-42a9-48a3-9499-347223f81433 ==============================
+[0m20:03:11.437806 [info ] [MainThread]: Running with dbt=1.9.0
+[0m20:03:11.439191 [debug] [MainThread]: running dbt with arguments {'printer_width': '80', 'indirect_selection': 'eager', 'write_json': 'True', 'log_cache_events': 'False', 'partial_parse': 'True', 'cache_selected_only': 'False', 'profiles_dir': 'C:\\Users\\deepa\\.dbt', 'debug': 'False', 'warn_error': 'None', 'log_path': 'c:\\Users\\deepa\\Documents\\GitHub\\Street-Fairy\\Deepana_codes\\logs', 'version_check': 'True', 'fail_fast': 'False', 'use_colors': 'True', 'use_experimental_parser': 'False', 'empty': 'None', 'quiet': 'False', 'no_print': 'None', 'warn_error_options': 'WarnErrorOptions(include=[], exclude=[])', 'introspect': 'True', 'log_format': 'default', 'invocation_command': 'dbt ', 'target_path': 'None', 'static_parser': 'True', 'send_anonymous_usage_stats': 'True'}
+[0m20:03:11.670917 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'project_id', 'label': '5daf6cbe-42a9-48a3-9499-347223f81433', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7DCAD350>]}
+[0m20:03:11.693844 [info ] [MainThread]: Warning: No packages were found in packages.yml
+[0m20:03:11.695899 [info ] [MainThread]: Warning: No packages were found in packages.yml
+[0m20:03:11.697262 [debug] [MainThread]: Command `cli deps` succeeded at 20:03:11.697083 after 0.50 seconds
+[0m20:03:11.697738 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7E85FAC0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7E8A9480>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000025F7E63AF50>]}
+[0m20:03:11.698161 [debug] [MainThread]: Flushing usage events
+[0m20:03:11.922884 [debug] [MainThread]: An error was encountered while trying to flush usage events
