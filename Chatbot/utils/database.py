@@ -1,27 +1,25 @@
 import snowflake.connector
 import os
 import json
-import pandas as pd
 import streamlit as st
 
 def get_snowflake_connection():
-    key_path = os.path.join(os.path.dirname(__file__), "..", "..", "key.json")
-    with open(key_path) as f:
-        creds = json.load(f)
-    return snowflake.connector.connect(**creds)
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.abspath(os.path.join(current_dir, "..", ".."))
+    key_path = os.path.join(root_dir, "key.json")
 
-def load_data_from_snowflake():
-    conn = get_snowflake_connection()
-    cursor = conn.cursor()
-    query = """
-        SELECT BUSINESS_ID, NAME, CITY, STATE, LATITUDE, LONGITUDE, CATEGORIES, FLATTENED_ATTRIBUTES,
-        PARSE_JSON(embedding)::VECTOR(FLOAT, 384) AS EMBEDDING
-        FROM BUSINESS_EMBEDDINGS
-    """
-    cursor.execute(query)
-    df = cursor.fetch_pandas_all()
-    conn.close()
-    return df
+    with open(key_path, "r") as f:
+        creds = json.load(f)
+
+    conn = snowflake.connector.connect(
+        user=creds["user"],
+        password=creds["password"],
+        account=creds["account"],
+        warehouse=creds["warehouse"],
+        database=creds["database"],
+        schema=creds["schema"]
+    )
+    return conn
 
 def save_preferences():
     try:
