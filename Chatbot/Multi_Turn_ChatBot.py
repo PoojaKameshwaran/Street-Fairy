@@ -8,21 +8,29 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import euclidean
 import faiss
 import snowflake.connector
+from dotenv import load_dotenv
+import os
 from chatbotfunction import process_chat_input,fetch_and_display_recommendations
 from utils import load_data_from_snowflake, get_lat_lon, run_similarity_search 
+load_dotenv()
+
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
 
 # --- Connect to Snowflake ---
 @st.cache_resource
 def get_snowflake_connection():
     conn = snowflake.connector.connect(
-    user='',
-    password='',
-    user='', #give your username and password
-    password='',
-    account='PDB57018',
-    warehouse='ANIMAL_TASK_WH',
-    database='STREET_FAIRY',
-    schema='PUBLIC'
+    user=snowflake_user,
+    password=snowflake_password,
+    account=snowflake_account,
+    warehouse=snowflake_warehouse,
+    database=snowflake_database,
+    schema=snowflake_schema
     )
     return conn
 

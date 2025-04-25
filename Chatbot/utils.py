@@ -8,17 +8,26 @@ from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import euclidean
 import faiss
 import snowflake.connector
+from dotenv import load_dotenv
+import os
 
+load_dotenv()
+snowflake_user = os.getenv('SNOWFLAKE_USER')
+snowflake_password = os.getenv('SNOWFLAKE_PASSWORD')
+snowflake_account = os.getenv('SNOWFLAKE_ACCOUNT')
+snowflake_warehouse = os.getenv('SNOWFLAKE_WAREHOUSE')
+snowflake_database = os.getenv('SNOWFLAKE_DATABASE')
+snowflake_schema = os.getenv('SNOWFLAKE_SCHEMA')
 
 
 def load_data_from_snowflake():
     conn = snowflake.connector.connect(
-    user='',
-    password='',
-    account='PDB57018',
-    warehouse='ANIMAL_TASK_WH',
-    database='STREET_FAIRY',
-    schema='PUBLIC'
+    user=snowflake_user,
+    password=snowflake_password,
+    account=snowflake_account,
+    warehouse=snowflake_warehouse,
+    database=snowflake_database,
+    schema=snowflake_schema
     )
     cursor = conn.cursor()
 
