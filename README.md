@@ -16,6 +16,9 @@ The project aims to recommend businesses to users based on their preferences and
 - **Recommendation Engine**: An LLM (Large Language Model) processes embeddings to generate personalized recommendations.
 - **Front-End**: A Streamlit app provides an interface for users to receive and interact with recommendations.
 
+  ![WhatsApp Image 2025-04-24 at 21 35 13_8cba642f](https://github.com/user-attachments/assets/f2e3c730-01be-4099-9ae4-e88687678c38)
+
+
 ## Features
 
 - **Real-Time Recommendations**: Get instant business suggestions based on user preferences.
