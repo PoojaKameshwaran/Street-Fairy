@@ -1,7 +1,7 @@
 import streamlit as st
 from utils.query import run_similarity_search, query_ollama
 from utils.database import load_data_from_snowflake, save_preferences
-
+from utils.planner import display_preference_based_recommendations ##added by deepana
 
 def screen_2():
     st.title("🧚‍♀️Chat with the Fairy")
@@ -11,7 +11,14 @@ def screen_2():
     if "remaining_recs" not in st.session_state:
         st.session_state.remaining_recs = []
 
+    user_location = st.text_input("📍Where are you located?", placeholder="e.g., Florida")
     user_message = st.chat_input("What are you looking for?")
+    print(f"User Location: {user_location}")  # Print user location to debug
+    print(f"User Message: {user_message}")  # Print user message to debug
+   ##########Added by Deepana
+    if not user_location:
+        st.info("Please enter your location to start.")
+        return
 
     if user_message:
         st.chat_message("user").markdown(user_message)
@@ -39,7 +46,7 @@ def screen_2():
                 return
 
         df = load_data_from_snowflake()
-        results = run_similarity_search(query_input=user_message, df=df)
+        results = run_similarity_search(user_location,query_input=user_message, df=df)  ########Added by Deepana loc
 
         if results.empty:
             st.chat_message("assistant").warning("⚠️ No results found. Try asking differently.")
@@ -65,3 +72,8 @@ def screen_2():
             st.markdown("What did you think of this suggestion? You can say something like 'I liked it' or 'Not for me'. ✨")
 
         st.session_state.chat_history.append({"role": "assistant", "content": recommendation})
+
+        ########Added by Deepana
+        # 🌟 Show preference-based recommendations
+        st.session_state["user_location"] = user_location 
+        display_preference_based_recommendations()

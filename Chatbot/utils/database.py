@@ -10,6 +10,7 @@ def get_snowflake_connection():
         creds = json.load(f)
     return snowflake.connector.connect(**creds)
 
+@st.cache_data ###Added
 def load_data_from_snowflake():
     conn = get_snowflake_connection()
     cursor = conn.cursor()
