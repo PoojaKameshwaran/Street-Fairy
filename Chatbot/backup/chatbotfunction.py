@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from utils import load_data_from_snowflake, get_lat_lon, run_similarity_search 
+from Chatbot.backup.utils import load_data_from_snowflake, get_lat_lon, run_similarity_search 
 
 
 def process_chat_input(user_input, location_input):

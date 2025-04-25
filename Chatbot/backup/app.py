@@ -1,6 +1,6 @@
 import streamlit as st
-from chatbot_module import process_chat_input
-from utils import load_data_from_snowflake
+from Chatbot.backup.chatbot_module import process_chat_input
+from Chatbot.backup.utils import load_data_from_snowflake
 import re
 
 st.set_page_config(page_title="Street Fairy 🧚 Chatbot", layout="centered")

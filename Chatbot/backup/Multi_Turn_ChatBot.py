@@ -6,8 +6,8 @@ from geopy.geocoders import Nominatim
 from geopy.distance import geodesic
 from sklearn.metrics.pairwise import cosine_similarity
 from scipy.spatial.distance import euclidean
-from chatbotfunction import process_chat_input, fetch_and_display_recommendations
-from utils import load_data_from_snowflake, get_lat_lon, run_similarity_search, get_snowflake_connection, query_ollama
+from Chatbot.backup.chatbotfunction import process_chat_input, fetch_and_display_recommendations
+from Chatbot.backup.utils import load_data_from_snowflake, get_lat_lon, run_similarity_search, get_snowflake_connection, query_ollama
 import json
 
 def screen_0():
@@ -104,7 +104,7 @@ def screen_2():
         # ----- HANDLE FEEDBACK BEFORE SEARCH -----
         feedback_msg = user_message.lower()
 
-        if any(word in feedback_msg for word in ["i like", "liked it", "great", "perfect", "this works"]):
+        if any(word in feedback_msg for word in ["i like", "liked it", "great", "perfect", "this works", "i love it"]):
             if st.session_state.last_result is not None:
                 categories = st.session_state.last_result["CATEGORIES"]
                 st.session_state.feedback["liked"].update(map(str.strip, categories.lower().split(",")))
@@ -112,7 +112,7 @@ def screen_2():
                 st.chat_message("assistant").success("🌟 Glad you liked it! I'll remember that for next time.")
                 return
 
-        elif any(word in feedback_msg for word in ["not a fan", "dislike", "something else", "another", "next"]):
+        elif any(word in feedback_msg for word in ["not a fan", "dislike", "something else", "another", "next", "don't", "didn't like"]):
             if st.session_state.last_result is not None:
                 categories = st.session_state.last_result["CATEGORIES"]
                 st.session_state.feedback["disliked"].update(map(str.strip, categories.lower().split(",")))

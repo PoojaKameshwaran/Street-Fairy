@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 from sentence_transformers import SentenceTransformer
-from utils import run_similarity_search
+from Chatbot.backup.utils import run_similarity_search
 
 # Load embedding model once
 @st.cache_resource(show_spinner=False)
