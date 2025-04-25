@@ -28,42 +28,38 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 ## 📁 Chatbot/
-1. Multi_Turn_ChatBot.py
-This is the main Python script that controls the Streamlit interface and user interactions. It allows users to register, log in, and request business recommendations based on their location and preferences.
 
-Key Components:
-Snowflake Connection: The script connects to a Snowflake database to retrieve user preferences and business data.
+### 1. **Multi_Turn_ChatBot.py**
+*Main Streamlit application controlling the user interface and interactions.*
 
-User Login & Registration: The script has a registration page for new users and a login page for existing users.
+- **Snowflake Connection:** Connects to the Snowflake database to retrieve business and user data.
+- **User Login & Registration:** Provides pages for both new user registration and existing user login.
+- **Recommendation System:** Uses `load_data_from_snowflake()` and `run_similarity_search()` to generate business recommendations based on user input and preferences.
+- **Multi-Turn Chat:** Supports conversational follow-ups, allowing users to ask additional questions after receiving initial recommendations.
 
-Recommendation System: It uses the load_data_from_snowflake() and run_similarity_search() functions to recommend businesses based on user input.
+**Main Functions:**
+- `screen_0()`: Manages login and registration workflows.
+- `screen_2()`: Handles recommendation display and chat-based interactions.
+- `main()`: Entry point deciding which screen to show.
 
-Multi-Turn Chat: After providing initial recommendations, the user can engage in a multi-turn chat, asking follow-up questions about the results.
+---
 
-Main Functions:
-screen_0(): Manages user login and registration.
+### 2. **chatbotfunction.py**
+*Handles processing of chat input and similarity-based business retrieval.*
 
-screen_2(): Displays the business recommendation interface and handles the chat input for follow-up questions.
+- **process_chat_input():** Accepts user chat queries and runs similarity search using FAISS. Returns top matching business results and relevant details.
+- **SentenceTransformer Model:** Uses the `paraphrase-MiniLM-L6-v2` model for encoding input text and enabling semantic search across business embeddings.
 
-main(): The entry point for the Streamlit app, deciding the flow between screens.
+---
 
-2. chatbotfunction.py
-This file contains functions responsible for processing the chat input, handling user queries, and returning relevant results.
+### 3. **utils.py**
+*Provides supporting functions for data loading and similarity calculations.*
 
-Key Components:
-process_chat_input(): This function takes the user input from the chat and runs a similarity search using the run_similarity_search() function. It returns relevant business details based on similarity scores.
+- **load_data_from_snowflake():** Connects to Snowflake, fetches business data (including embeddings), and loads it as a Pandas DataFrame.
+- **get_lat_lon():** Uses Geopy to obtain latitude and longitude for any user-specified location.
+- **run_similarity_search():** Filters businesses within a 5km radius and computes similarity scores using FAISS and Sentence Transformers, returning top matches based on the query.
 
-SentenceTransformer Model: It uses the paraphrase-MiniLM-L6-v2 model to encode the input text and perform semantic search over the business embeddings.
-
-3. utils.py
-This utility file provides helper functions for location-based calculations and similarity search.
-
-Key Functions:
-load_data_from_snowflake(): This function connects to Snowflake, fetches the business data, and loads it into a DataFrame. The data includes business IDs, names, categories, attributes, and embeddings.
-
-get_lat_lon(): Uses Geopy to get the latitude and longitude of a user’s location based on input (e.g., city name).
-
-run_similarity_search(): This is the core function for performing a similarity search. It filters businesses based on proximity to the user and calculates similarity scores using FAISS and SentenceTransformers. The top businesses are returned based on similarity scores.
+---
 
 ## 📁 src/
 
