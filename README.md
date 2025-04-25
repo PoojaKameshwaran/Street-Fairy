@@ -252,47 +252,15 @@ This folder contains scripts for data loading, transformation, S3/Snowflake oper
 ---
 
 
-
-
-
-
-
-
-## 📁 src/
-
-This directory contains the core modules responsible for data processing, embedding generation, and recommendation logic.
-
-- **data_loader.py**  
-  Handles the ingestion of data from AWS S3 into Snowflake using Snowpipe. It defines functions to automate the loading process for the `business`, `reviews`, and `users` tables.
-
-- **embedding_generator.py**  
-  Processes the business table to generate embeddings that capture the features of each business. These embeddings are used to understand similarities between businesses.
-
-- **user_profile_builder.py**  
-  Constructs user profiles by analyzing their reviews and interactions. It aggregates user preferences to aid in personalized recommendations.
-
-- **recommendation_engine.py**  
-  Utilizes the business embeddings and user profiles to generate personalized business recommendations. It likely employs similarity metrics or machine learning models to rank businesses.
-
-
 ## 📁 app/
 
 Contains the Streamlit application that serves as the user interface for the recommendation system.
 
-- **app.py**  
+- **streamlit_app.py**  
   The main entry point for the Streamlit app. It provides an interface for users to input their preferences or user ID and displays personalized business recommendations.
-
-- **utils.py**  
-  Contains utility functions used by the Streamlit app, such as formatting outputs, handling user inputs, and interfacing with the recommendation engine.
 
 ---
 
-## 📁 config/
-
-Holds configuration files and parameters required for the project.
-
-- **config.yaml**  
-  A YAML file containing configuration parameters such as AWS credentials, Snowflake connection details, and other project-specific settings.
 
 ---
 
@@ -300,28 +268,13 @@ Holds configuration files and parameters required for the project.
 
 Includes Jupyter notebooks used for exploratory data analysis, prototyping, and testing.
 
-- **eda.ipynb**  
-  Performs exploratory data analysis on the Yelp dataset to understand data distributions, missing values, and other insights.
-
-- **embedding_visualization.ipynb**  
-  Visualizes the business embeddings using dimensionality reduction techniques like PCA or t-SNE to understand the embedding space.
+- **Data_preprocess_StreetFairy.ipynb**  
+  Performs data preprocessing and analysis on the Yelp dataset to clean and understand data distributions, missing values, and other insights.
+  Store the cleaned business and reviews table in a seperate table to be processed for embeddings.
 
 ---
 
-## 📁 tests/
 
-Contains unit tests to ensure the reliability and correctness of the project's components.
-
-- **test_data_loader.py**  
-  Tests the functions responsible for loading data from S3 into Snowflake.
-
-- **test_embedding_generator.py**  
-  Validates the embedding generation process for the business table.
-
-- **test_recommendation_engine.py**  
-  Ensures that the recommendation engine produces valid and personalized recommendations.
-
----
 
 ## 📄 requirements.txt
 
