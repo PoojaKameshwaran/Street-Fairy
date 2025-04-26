@@ -11,9 +11,9 @@ def display_preference_based_recommendations():
     user_location = st.session_state.get("user_location", "")
 
     if preferences:
-        st.markdown("### 🌟 Based on your previous visits and preferences!!")
+        st.markdown("### 🌟 Based on your previous visits why can't you plan for this? !!")
         preference_based_results = run_similarity_search(user_location,query_input=preferences, df=df)
-        top_2 = preference_based_results.head(2)
+        top_2 = preference_based_results.head(1)
 
         expected_columns = ["NAME", "CATEGORIES"]
         available_columns = [col for col in expected_columns if col in top_2.columns]
