@@ -23,4 +23,9 @@ geopy
 os
 json
 
+streamlit
+chromadb
+requests
+random
 
+snowflake-connector
