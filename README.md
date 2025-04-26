@@ -28,6 +28,7 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
+![image](https://github.com/user-attachments/assets/b7e0fcbc-4678-47a9-8cbc-159b264bb109)
 
 
 ## 📂 Chatbot/
@@ -305,6 +306,8 @@ This folder contains scripts for data loading, transformation, S3/Snowflake oper
 - Accepts user questions, runs vector search, and prints top business matches and their metadata.
 
 ---
+
+
 
 ---
 
