@@ -30,19 +30,20 @@ The project aims to recommend businesses to users based on their preferences and
 
 
 
-## 📂 Chatbot/
+# 📂 Chatbot/
 
 ---
 
-* **main.py**  
+## **main.py**  
   Entry point for the app; starts the Streamlit UI.
   App entry point.
   Imports and launches the main Streamlit UI with screen_ui().
+
 ---
 
 
 
-* **screen.py**  
+## **screen.py**  
   - Main UI router: sidebar, tabs (login & chat), navigation logic. Sets up the sidebar, manages tab navigation (Login/Register, Recommendations & Chat), and delegates control to the appropriate screen.
   
   - Main UI logic and navigation for the app.
@@ -59,7 +60,7 @@ The project aims to recommend businesses to users based on their preferences and
 ---
 
 
-* **screens/chat.py**  
+## **screens/chat.py**  
   - Chat UI: manages chat history, user queries, recommendations, and conversation flow. Conversational chat interface. Handles user chat, displays chat history, handles user input, business   
     recommendations, and context-aware suggestions based on user actions and search queries.
 
@@ -78,7 +79,7 @@ The project aims to recommend businesses to users based on their preferences and
 ---
 
 
-* **screens/login.py**  
+## **screens/login.py**  
   - User login/registration UI; connects to Snowflake for authentication and preference storage. User authentication and registration.
   - Manages user login and new user registration. Connects to Snowflake to check credentials or create a new user. Loads and updates user preferences in session state.
   - User authentication and registration interface. Presents a radio button to switch between Login and Registration.
@@ -88,7 +89,7 @@ The project aims to recommend businesses to users based on their preferences and
 ---
 
 
-* **utils/database.py**  
+## **utils/database.py**  
    - Database helper functions; handles connection and updates to user preferences in Snowflake. Database utilities. Connects to Snowflake using credentials in key.json. Provides functions to retrieve and update user preferences securely.
 
   - Helper functions for database operations (Snowflake).
@@ -105,8 +106,7 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
-
-* **utils/query.py**  
+## **utils/query.py**  
   - Embedding search using ChromaDB, distance calculation, and calls to the LLM API (Ollama) for natural language recommendations. Embedding-based search and LLM integration.
     
   - Loads the ChromaDB business embeddings collection, runs semantic similarity search with SentenceTransformer embeddings, computes distances, and returns ranked business results. Also provides query_ollama() for generating recommendations using a local LLM via HTTP API.
@@ -119,26 +119,8 @@ The project aims to recommend businesses to users based on their preferences and
 
   - Handles missing data by generating default values (e.g., stars, distances).
 
-  - Provides a function to send prompts to a local Ollama LLM server (or any compatible LLM API). Returns model-generated, contextually relevant recommendations for the chat UI.
+  - Provides a function to send prompts to a local Ollama LLM server (or any compatible LLM API). Returns model-generated, contextually relevant recommendations for the chat UI. Uses caching for fast repeated access to the ChromaDB collection.
 
-Uses caching for fast repeated access to the ChromaDB collection.
----
-
-
-### 1. **Multi_Turn_ChatBot.py**
-*Main Streamlit application controlling the user interface and interactions.*
-
-- **Snowflake Connection:** Connects to the Snowflake database to retrieve business and user data.
-- **User Login & Registration:** Provides pages for both new user registration and existing user login.
-- **Recommendation System:** Uses `load_data_from_snowflake()` and `run_similarity_search()` to generate business recommendations based on user input and preferences.
-- **Multi-Turn Chat:** Supports conversational follow-ups, allowing users to ask additional questions after receiving initial recommendations.
-
-**Main Functions:**
-- `screen_0()`: Manages login and registration workflows.
-- `screen_2()`: Handles recommendation display and chat-based interactions.
-- `main()`: Entry point deciding which screen to show.
-
----
 
 
 ---
