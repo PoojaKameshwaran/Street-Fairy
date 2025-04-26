@@ -51,20 +51,20 @@ The project aims to recommend businesses to users based on their preferences and
 ---
 
 * **screens/chat.py**  
-  Chat UI: manages chat history, user queries, recommendations, and conversation flow.
-  Conversational chat interface.
-  Handles user chat, displays chat history, handles user input, business recommendations, and context-aware suggestions based on user actions and search queries.
-  Main UI logic and navigation for the app.
+  - Chat UI: manages chat history, user queries, recommendations, and conversation flow. Conversational chat interface. Handles user chat, displays chat history, handles user input, business   
+    recommendations, and context-aware suggestions based on user actions and search queries.
+  
+  -  Main UI logic and navigation for the app.
 
-  Configures Streamlit’s page settings (title, layout).
+  -  Configures Streamlit’s page settings (title, layout).
 
-  Builds a sidebar with app info and user login status.
+  -  Builds a sidebar with app info and user login status.
 
-  Uses two main tabs: Login/Register and Recommendations & Chat.
+  -  Uses two main tabs: Login/Register and Recommendations & Chat.
 
-  Delegates logic to screen_0 (login/register) and screen_2 (chat) based on user session state.
+  -  Delegates logic to screen_0 (login/register) and screen_2 (chat) based on user session state.
 
-  Ensures users must log in before accessing chat/recommendations
+  -   nsures users must log in before accessing chat/recommendations
 ---
 
 ---
