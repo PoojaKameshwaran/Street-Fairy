@@ -28,7 +28,7 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
-## Itinery Planner Output
+
 
 
 ![image](https://github.com/user-attachments/assets/62bfee83-6ffe-4e29-adf6-01f5ce429932)
