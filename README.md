@@ -40,19 +40,10 @@ The project aims to recommend businesses to users based on their preferences and
   Imports and launches the main Streamlit UI with screen_ui().
 ---
 
----
+
 
 * **screen.py**  
-  Main UI router: sidebar, tabs (login & chat), navigation logic.
-  Main app logic.
-  Sets up the sidebar, manages tab navigation (Login/Register, Recommendations & Chat), and delegates control to the appropriate screen.
----
-
----
-
-* **screens/chat.py**  
-  - Chat UI: manages chat history, user queries, recommendations, and conversation flow. Conversational chat interface. Handles user chat, displays chat history, handles user input, business   
-    recommendations, and context-aware suggestions based on user actions and search queries.
+  - Main UI router: sidebar, tabs (login & chat), navigation logic. Sets up the sidebar, manages tab navigation (Login/Register, Recommendations & Chat), and delegates control to the appropriate screen.
   
   - Main UI logic and navigation for the app.
 
@@ -67,30 +58,72 @@ The project aims to recommend businesses to users based on their preferences and
   - nsures users must log in before accessing chat/recommendations
 ---
 
+
+* **screens/chat.py**  
+  - Chat UI: manages chat history, user queries, recommendations, and conversation flow. Conversational chat interface. Handles user chat, displays chat history, handles user input, business   
+    recommendations, and context-aware suggestions based on user actions and search queries.
+
+  - Conversational chat screen with the Street Fairy assistant.
+
+  - Shows a sticky, modern chat UI using Streamlit’s chat components and custom CSS.
+
+  - Displays chat history (user and assistant messages). Accepts and processes user chat input.
+
+  - Checks if the user is referencing a previously recommended business. Handles search for nearby places using embedding-based similarity.
+
+  - Shows friendly, summarized recommendations with LLM-generated responses (via Ollama). Supports "planning mode" for navigation between places.
+
+  - Updates and reruns UI after each new user input.
+
 ---
+
 
 * **screens/login.py**  
-  User login/registration UI; connects to Snowflake for authentication and preference storage.
-  User authentication and registration.
-  Manages user login and new user registration. Connects to Snowflake to check credentials or create a new user. Loads and updates user preferences in session state.
+  - User login/registration UI; connects to Snowflake for authentication and preference storage. User authentication and registration.
+  - Manages user login and new user registration. Connects to Snowflake to check credentials or create a new user. Loads and updates user preferences in session state.
+  - User authentication and registration interface. Presents a radio button to switch between Login and Registration.
+  - On login: Connects to Snowflake and verifies credentials. Loads user name, ID, and preference categories into session state. Initializes feedback tracking (liked/disliked categories).
+  - On registration: Accepts user details and preferences. Inserts new user record into the Snowflake database. Handles errors (duplicate ID, missing fields). Provides clear feedback for success, errors, or incomplete forms.
+
 ---
----
+
 
 * **utils/database.py**  
-  Database helper functions; handles connection and updates to user preferences in Snowflake.
-  Database utilities.
-  Connects to Snowflake using credentials in key.json. Provides functions to retrieve and update user preferences securely.
+   - Database helper functions; handles connection and updates to user preferences in Snowflake. Database utilities. Connects to Snowflake using credentials in key.json. Provides functions to retrieve and update user preferences securely.
+
+  - Helper functions for database operations (Snowflake).
+
+  - Loads Snowflake credentials from a secure key.json (not in repo).
+
+  - Creates and returns a Snowflake database connection object.
+
+  - Updates user preferences (CATEGORIES) in the database when users like/dislike businesses.
+
+  - Uses Streamlit toast/alerts for feedback on preference updates.
+
+  - Handles connection cleanup and error reporting gracefully.
+
 ---
----
+
 
 * **utils/query.py**  
-  Embedding search using ChromaDB, distance calculation, and calls to the LLM API (Ollama) for natural language recommendations.
-  Embedding-based search and LLM integration.
-  Loads the ChromaDB business embeddings collection, runs semantic similarity search with SentenceTransformer embeddings, computes distances, and returns ranked business results.
-  Also provides query_ollama() for generating recommendations using a local LLM via HTTP API.
+  - Embedding search using ChromaDB, distance calculation, and calls to the LLM API (Ollama) for natural language recommendations. Embedding-based search and LLM integration.
+    
+  - Loads the ChromaDB business embeddings collection, runs semantic similarity search with SentenceTransformer embeddings, computes distances, and returns ranked business results. Also provides query_ollama() for generating recommendations using a local LLM via HTTP API.
+
+  - Handles embedding search, vector retrieval, and LLM interaction. Loads a persistent ChromaDB collection with SentenceTransformer embeddings.
+
+  - Performs semantic similarity searches for user queries: Returns metadata-rich business results (location, stars, categories, etc.).
+
+  - Computes distances (using geopy) between user and business locations.
+
+  - Handles missing data by generating default values (e.g., stars, distances).
+
+  - Provides a function to send prompts to a local Ollama LLM server (or any compatible LLM API). Returns model-generated, contextually relevant recommendations for the chat UI.
+
+Uses caching for fast repeated access to the ChromaDB collection.
 ---
 
----
 
 ### 1. **Multi_Turn_ChatBot.py**
 *Main Streamlit application controlling the user interface and interactions.*
@@ -107,22 +140,6 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
-### 2. **chatbotfunction.py**
-*Handles processing of chat input and similarity-based business retrieval.*
-
-- **process_chat_input():** Accepts user chat queries and runs similarity search using FAISS. Returns top matching business results and relevant details.
-- **SentenceTransformer Model:** Uses the `paraphrase-MiniLM-L6-v2` model for encoding input text and enabling semantic search across business embeddings.
-
----
-
-### 3. **utils.py**
-*Provides supporting functions for data loading and similarity calculations.*
-
-- **load_data_from_snowflake():** Connects to Snowflake, fetches business data (including embeddings), and loads it as a Pandas DataFrame.
-- **get_lat_lon():** Uses Geopy to obtain latitude and longitude for any user-specified location.
-- **run_similarity_search():** Filters businesses within a 5km radius and computes similarity scores using FAISS and Sentence Transformers, returning top matches based on the query.
-
----
 
 ---
 
