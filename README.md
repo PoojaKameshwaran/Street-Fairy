@@ -29,11 +29,11 @@ The project aims to recommend businesses to users based on their preferences and
 ---
 
 
+![image](https://github.com/user-attachments/assets/d51ee8eb-f699-4454-8dab-dc9f61b41114)
 
 
-![image](https://github.com/user-attachments/assets/62bfee83-6ffe-4e29-adf6-01f5ce429932)
 
-
+---
 
 ## 📂 Chatbot/
 
