@@ -32,36 +32,54 @@ The project aims to recommend businesses to users based on their preferences and
 
 ## 📂 Chatbot/
 
+---
+
 * **main.py**  
   Entry point for the app; starts the Streamlit UI.
   App entry point.
   Imports and launches the main Streamlit UI with screen_ui().
+---
+
+---
 
 * **screen.py**  
   Main UI router: sidebar, tabs (login & chat), navigation logic.
   Main app logic.
   Sets up the sidebar, manages tab navigation (Login/Register, Recommendations & Chat), and delegates control to the appropriate screen.
+---
+
+---
 
 * **screens/chat.py**  
   Chat UI: manages chat history, user queries, recommendations, and conversation flow.
   Conversational chat interface.
   Handles user chat, displays chat history, handles user input, business recommendations, and context-aware suggestions based on user actions and search queries.
+---
+
+---
 
 * **screens/login.py**  
   User login/registration UI; connects to Snowflake for authentication and preference storage.
   User authentication and registration.
   Manages user login and new user registration. Connects to Snowflake to check credentials or create a new user. Loads and updates user preferences in session state.
+---
+---
 
 * **utils/database.py**  
   Database helper functions; handles connection and updates to user preferences in Snowflake.
   Database utilities.
   Connects to Snowflake using credentials in key.json. Provides functions to retrieve and update user preferences securely.
+---
+---
 
 * **utils/query.py**  
   Embedding search using ChromaDB, distance calculation, and calls to the LLM API (Ollama) for natural language recommendations.
   Embedding-based search and LLM integration.
   Loads the ChromaDB business embeddings collection, runs semantic similarity search with SentenceTransformer embeddings, computes distances, and returns ranked business results.
   Also provides query_ollama() for generating recommendations using a local LLM via HTTP API.
+---
+
+---
 
 ### 1. **Multi_Turn_ChatBot.py**
 *Main Streamlit application controlling the user interface and interactions.*
