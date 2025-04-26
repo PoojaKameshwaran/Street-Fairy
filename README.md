@@ -28,7 +28,7 @@ The project aims to recommend businesses to users based on their preferences and
 
 ---
 
-## Itinery Planner
+## Itinerary Planner
 
 ![image](https://github.com/user-attachments/assets/d51ee8eb-f699-4454-8dab-dc9f61b41114)
 
@@ -43,6 +43,7 @@ The project aims to recommend businesses to users based on their preferences and
 ## **main.py**  
   Entry point for the app; starts the Streamlit UI.
   App entry point.
+  Utilize streamlit run Chatbot/main.py to launch the application. The application assumes you have ollama running mistral SLM (Small Language Model).
   Imports and launches the main Streamlit UI with screen_ui().
 
 ---
