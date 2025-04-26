@@ -1,138 +1,110 @@
-# screens/chat.py
-
 import streamlit as st
 from utils.query import run_similarity_search, query_ollama
 
 def screen_2():
     st.title("🧚‍♀️ Chat with Street Fairy")
 
-    # Scrollable chat history + truly sticky chat input
-    st.markdown(
-        """
+    # --- Sticky Chat UI Style ---
+    st.markdown("""
         <style>
-        /* Make the entire main container scrollable */
-        .block-container {
-            height: 90vh;
-            overflow-y: auto;
-            padding-bottom: 120px; /* Enough space for sticky input */
-        }
-
-        /* Sticky chat input at the bottom */
+        .block-container { height: 90vh; overflow-y: auto; padding-bottom: 120px; }
         section[data-testid="stChatInput"] {
-            position: fixed;
-            bottom: 1rem;
-            width: 85%;
-            left: 7%;
-            right: 7%;
-            z-index: 1000;
-            background: transparent;
-            box-shadow: none;
-            border: none;
+            position: fixed; bottom: 1rem; width: 85%; left: 7%; right: 7%;
+            z-index: 1000; background: transparent; box-shadow: none; border: none;
         }
-
-        /* Remove ugly border above the chat input */
-        section[data-testid="stChatInput"] > div:first-child {
-            border-top: none;
-            background: transparent;
-            box-shadow: none;
-        }
+        section[data-testid="stChatInput"] > div:first-child { border-top: none; background: transparent; box-shadow: none; }
         </style>
-        """,
-        unsafe_allow_html=True
-    )
+    """, unsafe_allow_html=True)
 
+    # --- Session State Initialization ---
     if "chat_history" not in st.session_state:
         st.session_state.chat_history = []
-    if "feedback" not in st.session_state:
-        st.session_state.feedback = {"liked": set(), "disliked": set()}
-    if "remaining_recs" not in st.session_state:
-        st.session_state.remaining_recs = []
+    if "previous_recommendations" not in st.session_state:
+        st.session_state.previous_recommendations = []
+    if "current_location" not in st.session_state:
+        st.session_state.current_location = None
+    if "visited_places" not in st.session_state:
+        st.session_state.visited_places = []
+    if "mode" not in st.session_state:
+        st.session_state.mode = "search"
 
-    if "user_info" not in st.session_state:
-        st.warning("Please log in first.")
-        return
-
-    # ---------------- Chat history area ----------------
+    # --- 🧚‍♀️ Show Chat History ---
     with st.container():
-        chat_placeholder = st.container()
-        with chat_placeholder:
-            st.markdown('<div class="chat-history">', unsafe_allow_html=True)
-            for msg in st.session_state.chat_history:
-                with st.chat_message(msg["role"]):
-                    st.markdown(msg["content"])
-            st.markdown('</div>', unsafe_allow_html=True)
+        for msg in st.session_state.chat_history:
+            with st.chat_message(msg["role"]):
+                st.markdown(msg["content"])
 
-    # ---------------- Chat input area ----------------
-    with st.container():
-        st.markdown('<div class="chat-input">', unsafe_allow_html=True)
-        user_message = st.chat_input("What are you looking for today?")
-        st.markdown('</div>', unsafe_allow_html=True)
+    # --- 🧚‍♀️ Chat Input ---
+    user_message = st.chat_input("Where would you like to go next? ✨")
 
-    # -------------- Handle user input --------------
     if user_message:
         st.session_state.chat_history.append({"role": "user", "content": user_message})
 
-        if any(x in user_message.lower() for x in ["not a fan", "don't like", "dislike", "another", "next"]):
-            if st.session_state.remaining_recs:
-                next_suggestion = st.session_state.remaining_recs.pop(0)
-                st.session_state.feedback["disliked"].update(next_suggestion["CATEGORIES"].split(","))
+        # --- 🧚‍♀️ If user mentions a previously suggested place ---
+        if st.session_state.previous_recommendations:
+            matched_place = None
+            for place in st.session_state.previous_recommendations:
+                if place["NAME"].lower() in user_message.lower():
+                    matched_place = place
+                    break
 
-                retry_prompt = f"""
-                You are Street Fairy 🧚‍♀️. The last suggestion wasn't a hit.
-                Here's another business to consider:
+            if matched_place:
+                # 🎯 User selected this place!
+                st.session_state.current_location = (matched_place["LATITUDE"], matched_place["LONGITUDE"])
+                st.session_state.visited_places.append(matched_place)
+                st.session_state.mode = "planning"  # Switch to planning mode
 
-                - {next_suggestion['NAME']} ({next_suggestion['CATEGORIES']} in {next_suggestion['CITY']}, {next_suggestion['STATE']})
+                celebration_text = f"""
+                🎉 Yay! You chose **{matched_place['NAME']}** in {matched_place['CITY']}, {matched_place['STATE']}!
+                ⭐ {matched_place.get('STARS', '?')} stars — 📏 {matched_place.get('DISTANCE_KM', '?')} km away
 
-                Please describe it warmly and concisely without inventing anything.
+                ✨ Now, tell me where you'd like to go from here!
+                For example: "Find me a gym nearby" or "Show me some cozy cafes!"
                 """
-                with st.spinner("🧚‍♀️ Finding another magical place..."):
-                    response = query_ollama(retry_prompt, model="mistral")
-
-                st.session_state.chat_history.append({"role": "assistant", "content": response})
-                st.rerun()  # Refresh the page to show new message
-                return
-            else:
-                st.session_state.chat_history.append({"role": "assistant", "content": "🧚‍♀️ No more suggestions left! Try a different query."})
+                st.session_state.chat_history.append({"role": "assistant", "content": celebration_text})
                 st.rerun()
                 return
 
-        # New query flow
-        with st.spinner("🧚‍♀️ Street Fairy is thinking..."):
-            results = run_similarity_search(user_message)
+        # --- 🧚‍♀️ Normal Search Flow (find new places) ---
+        with st.spinner("🧚‍♀️ Searching for magical places..."):
+            if st.session_state.mode == "planning" and st.session_state.current_location:
+                results = run_similarity_search(user_message, around_location=st.session_state.current_location)
+            else:
+                results = run_similarity_search(user_message)
 
         if not results:
-            st.session_state.chat_history.append({"role": "assistant", "content": "⚠️ No good results found. Try something different?"})
+            st.session_state.chat_history.append({"role": "assistant", "content": "⚠️ No magical places found! Try asking something else ✨"})
             st.rerun()
             return
 
-        top_results = results[:5]
-        st.session_state.remaining_recs = results[5:]
+        # --- 🔥 Save these results for future matching ---
+        st.session_state.previous_recommendations = results[:5]
 
-        business_str = "\n".join([
-            f"- {b['NAME']} ({b['CATEGORIES']} in {b.get('CITY', '')}, {b['STATE']})"
-            for b in top_results
+        # --- 📜 Summarize businesses nicely ---
+        business_summaries = "\n\n".join([
+            f"✨ **{b['NAME']}** ({b.get('CATEGORIES', 'No categories')})\n"
+            f"📍 {b.get('CITY', 'Unknown')}, {b.get('STATE', 'Unknown')} — ⭐ {b.get('STARS', '?')} stars — 📏 {b.get('DISTANCE_KM', '?')} km"
+            for b in st.session_state.previous_recommendations
         ])
 
         recommendation_prompt = f"""
-        You are Street Fairy 🧚‍♀️ suggesting lovely places.
+        You are Street Fairy 🧚‍♀️ — a cheerful helper who recommends magical nearby places!
 
         The user asked: "{user_message}"
-        Here are 5 real businesses found:
 
-        {business_str}
+        Here are 5 real businesses nearby:
 
-        ✅ Recommend 2-3 options warmly.
-        ✅ Mention names, locations, and something special about them.
-        🚫 Do not invent fake businesses.
+        {business_summaries}
+
+        🎯 Recommend nearest 3-5 places warmly.
+        - Mention name, location, distance, and why it's great
+        - Sound friendly and concise
+        - NEVER invent new businesses
         """
 
-        try:
-            with st.spinner("🧚‍♀️ Preparing magic suggestions..."):
-                recommendation = query_ollama(recommendation_prompt, model="mistral")
+        with st.spinner("🧚‍♀️ Working the fairy magic..."):
+            fairy_response = query_ollama(recommendation_prompt)
 
-            st.session_state.chat_history.append({"role": "assistant", "content": recommendation})
-            st.rerun()
+        st.session_state.chat_history.append({"role": "assistant", "content": fairy_response})
+        st.rerun()
 
-        except Exception as e:
-            st.session_state.chat_history.append({"role": "assistant", "content": f"⚠️ Oops, Fairy magic failed: {e}"})
-            st.rerun()
